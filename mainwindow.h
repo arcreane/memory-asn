@@ -31,6 +31,7 @@ public slots:
     void easy();
     void medium();
     void hard();
+    void StartGame();
     void EndGame(bool win);
     void UpdateTimer();
 

@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, &MainWindow::UpdateTimer);
-    easy();
+    StartGame();
 }
 
 void MainWindow::easy(){
@@ -137,6 +137,22 @@ void MainWindow::OnCardClicked(QPushButton* button, const QString& card) {
     if(victory <= 0){
         EndGame(true);
     }
+}
+
+void MainWindow::StartGame(){
+    QMessageBox msgBox;
+    msgBox.setText("Vous désirez jouer à :");
+
+    QPushButton* solo = msgBox.addButton(tr("1 joueur"), QMessageBox::ActionRole);
+    QPushButton* duo = msgBox.addButton(tr("2 joueurs"), QMessageBox::ActionRole);
+
+    if (msgBox.clickedButton() == solo){
+        easy();
+    } else if(msgBox.clickedButton() == duo){
+        easy();
+    }
+
+    msgBox.exec();
 }
 
 void MainWindow::EndGame(bool win) {
