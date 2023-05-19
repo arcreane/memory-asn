@@ -18,7 +18,7 @@ void MainWindow::easy(){
     two = 0;
     victory = 12;
     difficulty = 0;
-    Random_cards(12);
+    Random_cards();
 }
 
 void MainWindow::medium(){
@@ -28,7 +28,7 @@ void MainWindow::medium(){
     two = 0;
     victory = 18;
     difficulty = 1;
-    Random_cards(18);
+    Random_cards();
 }
 
 void MainWindow::hard(){
@@ -38,12 +38,11 @@ void MainWindow::hard(){
     two = 0;
     victory = 24;
     difficulty = 2;
-    Random_cards(24);
+    Random_cards();
 }
 
-void MainWindow::Random_cards(int _difficulty){
-    const int kNumCards = _difficulty * 2;
-    const int kCardsPerColor = _difficulty;
+void MainWindow::Random_cards(){
+    const int kNumCards = victory * 2;
     int cnt = 0;
 
     if(cards.size() > 0){
@@ -52,7 +51,7 @@ void MainWindow::Random_cards(int _difficulty){
 
     while (cards.size() < kNumCards) {
         cards << QString::number(cnt) + ".gif";
-        cnt = (cnt + 1) % kCardsPerColor;
+        cnt = (cnt + 1) % victory;
     }
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
@@ -97,6 +96,11 @@ void MainWindow::Display_cards() {
 }
 
 void MainWindow::OnCardClicked(QPushButton* button, const QString& card) {
+    QPalette palette_active;
+    QPalette palette_inactive;
+    palette_active.setColor(QPalette::WindowText, Qt::black);
+    palette_inactive.setColor(QPalette::WindowText, Qt::green);
+
     if(button != memory_but)
         two++;
     if(two == 1){
@@ -123,6 +127,14 @@ void MainWindow::OnCardClicked(QPushButton* button, const QString& card) {
         if(!memory_str.compare(card)){
             button->setDisabled(true);
             memory_but->setDisabled(true);
+            current_user = !current_user;
+            if(number_player != 1 && current_user == true){
+                player1 += 1;
+                ui->point_1->setText(QString::number(player1));
+            } else if(number_player != 1 && current_user == false){
+                player2++;
+                ui->point_2->setText(QString::number(player2));
+            }
             victory--;
         } else {
             QTimer::singleShot(1000, [this, button, scaled_return, card](){
@@ -130,12 +142,26 @@ void MainWindow::OnCardClicked(QPushButton* button, const QString& card) {
                 this->memory_but->setIcon(QIcon(scaled_return));
             });
         }
+        if(number_player != 1)
+            current_user = !current_user;
+        if(current_user == true){
+            ui->point_1->setPalette(palette_active);
+            ui->player1->setPalette(palette_active);
+            ui->point_2->setPalette(palette_inactive);
+            ui->player2->setPalette(palette_inactive);
+        } else {
+            ui->point_1->setPalette(palette_inactive);
+            ui->player1->setPalette(palette_inactive);
+            ui->point_2->setPalette(palette_active);
+            ui->player2->setPalette(palette_active);
+        }
         memory_but->blockSignals(false);
         two = 0;
     }
 
     if(victory <= 0){
-        EndGame(true);
+        timer->stop();
+        EndGame();
     }
 }
 
@@ -146,19 +172,35 @@ void MainWindow::StartGame(){
     QPushButton* solo = msgBox.addButton(tr("1 joueur"), QMessageBox::ActionRole);
     QPushButton* duo = msgBox.addButton(tr("2 joueurs"), QMessageBox::ActionRole);
 
-    if (msgBox.clickedButton() == solo){
-        easy();
-    } else if(msgBox.clickedButton() == duo){
-        easy();
-    }
 
     msgBox.exec();
+
+    if (msgBox.clickedButton() == solo){
+        QLayoutItem* item;
+        while ((item = ui->player1_grid->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        while ((item = ui->player2_grid->takeAt(0)) != nullptr) {
+            delete item->widget();
+            delete item;
+        }
+        number_player = 1;
+        easy();
+    } else if(msgBox.clickedButton() == duo){
+        number_player = 2;
+        player1 = 0;
+        player2 = 0;
+        qDebug() << "player 1 : " << player1;
+        current_user = true;
+        easy();
+    }
 }
 
-void MainWindow::EndGame(bool win) {
-    if(win == false){
+void MainWindow::EndGame() {
+    if(number_player == 1){
         QMessageBox msgBox;
-        msgBox.setText("Tu as perdu !");
+        msgBox.setText("Tu as gagné en " + timeStr + " !");
         msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
 
@@ -167,17 +209,19 @@ void MainWindow::EndGame(bool win) {
         msgBox.exec();
 
         if (msgBox.clickedButton() == restartButton) {
-            if(difficulty == 0)
-                easy();
-            else if(difficulty == 1)
-                medium();
-            else
-                hard();
+            StartGame();
         }
     } else {
         QMessageBox msgBox;
-        msgBox.setText("Tu as gagné !");
-            msgBox.setStandardButtons(QMessageBox::Ok);
+        if(player1 > player2){
+            msgBox.setText("Le joueur 1 a gagné !");
+        } else if(player2 > player1){
+            msgBox.setText("Le joueur 2 a gagné !");
+        } else {
+            msgBox.setText("Egalité parfaite !");
+        }
+
+        msgBox.setStandardButtons(QMessageBox::Ok);
         msgBox.setDefaultButton(QMessageBox::Ok);
 
         QPushButton* restartButton = msgBox.addButton(tr("Recommencer"), QMessageBox::ActionRole);
@@ -185,12 +229,7 @@ void MainWindow::EndGame(bool win) {
         msgBox.exec();
 
         if (msgBox.clickedButton() == restartButton) {
-            if(difficulty == 0)
-                easy();
-            else if(difficulty == 1)
-                medium();
-            else
-                hard();
+            StartGame();
         }
     }
 }
@@ -199,7 +238,7 @@ void MainWindow::UpdateTimer() {
     elapsedTime++;
     int minutes = elapsedTime / 60;
     int seconds = elapsedTime % 60;
-    QString timeStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
+    timeStr = QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0'));
     ui->label_timer->setText(timeStr);
 }
 

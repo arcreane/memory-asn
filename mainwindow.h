@@ -25,14 +25,14 @@ public:
     ~MainWindow();
 
 public slots:
-    void Random_cards(int diff);
+    void Random_cards();
     void Display_cards();
     void OnCardClicked(QPushButton* button, const QString& card);
     void easy();
     void medium();
     void hard();
     void StartGame();
-    void EndGame(bool win);
+    void EndGame();
     void UpdateTimer();
 
 private:
@@ -46,5 +46,10 @@ private:
     int difficulty;
     QTimer* timer;
     int elapsedTime;
+    QString timeStr;
+    bool current_user;
+    int player1;
+    int player2;
+    int number_player;
 };
 #endif // MAINWINDOW_H

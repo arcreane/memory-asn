@@ -67,28 +67,84 @@
      </layout>
     </item>
     <item>
-     <widget class="QLabel" name="label_timer">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>267</height>
-       </size>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>30</pointsize>
-       </font>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::NoFrame</enum>
-      </property>
-      <property name="text">
-       <string>00:00</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignHCenter|Qt::AlignTop</set>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <layout class="QVBoxLayout" name="player1_grid">
+        <item>
+         <widget class="QLabel" name="player1">
+          <property name="text">
+           <string>Player 1</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="point_1">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignHCenter|Qt::AlignTop</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="player2_grid">
+        <item>
+         <widget class="QLabel" name="player2">
+          <property name="text">
+           <string>Player 2</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="point_2">
+          <property name="text">
+           <string>0</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignHCenter|Qt::AlignTop</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_timer">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>267</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>30</pointsize>
+           </font>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="text">
+           <string>00:00</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignHCenter|Qt::AlignTop</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </item>
     <item>
      <layout class="QGridLayout" name="grid_cards"/>
